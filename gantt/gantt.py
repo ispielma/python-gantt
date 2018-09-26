@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 __author__ = 'Alexandre Norman (norman at xael.org)'
 __version__ = '0.6.0'
-__last_modification__ = '2016.03.20'
+__last_modification__ = '2018.08.26'
 
 import codecs
 import datetime
@@ -1645,12 +1645,45 @@ class Project(object):
         """
         Add a Task to the Project. Task can also be a subproject
 
-        Keyword arguments:
+        Arguments:
         task -- Task or Project object
         """
         self.tasks.append(task)
         self.cache_nb_elements = None
         return
+
+    def Task(self, **kwargs):
+        """
+        Creates a Task and adds it to the project.  This is a pure convience
+        function to reduce clutter in the high-level script
+        
+        All of the key word arguments are passed directly on to create
+        a Task object
+        
+        returns the task
+        """
+        
+        t = Task(**kwargs)
+        self.add_task(t)
+        
+        return t
+
+    def Milestone(self, **kwargs):
+        """
+        Creates a Milestone and adds it to the project.  This is a pure 
+        convience function to reduce clutter in the high-level script
+        
+        All of the key word arguments are passed directly on to create
+        a Milestone object
+        
+        returns the Milestone
+        """
+        
+        m = Milestone(**kwargs)
+        self.add_task(m)
+        
+        return m
+
 
     def _svg_calendar(self, maxx, maxy, start_date, today=None, scale=DRAW_WITH_DAILY_SCALE, offset=0):
         """
@@ -1789,13 +1822,14 @@ class Project(object):
         return dwg
 
 
-    def make_svg_for_tasks(self, filename, today=None, start=None, end=None, scale=DRAW_WITH_DAILY_SCALE, title_align_on_left=False, offset=0):
+    def make_svg_for_tasks(self, filename=None, today=None, start=None, end=None, scale=DRAW_WITH_DAILY_SCALE, title_align_on_left=False, offset=0):
         """
         Draw gantt of tasks and output it to filename. If start or end are
         given, use them as reference, otherwise use project first and last day
 
         Keyword arguments:
         filename -- string, filename to save to OR file object
+            defaults to the objects name + .svg
         today -- datetime.date of day marked as a reference
         start -- datetime.date of first day to draw
         end -- datetime.date of last day to draw
@@ -1807,6 +1841,8 @@ class Project(object):
             __LOG__.warning('** Empty project : {0}'.format(self.name))
             return
 
+        if filename is None:
+            filename=self.name+'.svg'
 
         self._reset_coord()
 
