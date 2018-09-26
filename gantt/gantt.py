@@ -264,7 +264,7 @@ class GroupOfResources(object):
     """
     Class for grouping resources
     """
-    def __init__(self, name, fullname=None):
+    def __init__(self, name, fullname=None, description=None):
         """
         Init a group of resource resource
 
@@ -279,6 +279,11 @@ class GroupOfResources(object):
             self.fullname = fullname
         else:
             self.fullname = name
+
+        if description is not None:
+            self.description = str(description)
+        else:
+            self.description = ''
 
         self.resources = []
 
@@ -440,7 +445,7 @@ class Resource(object):
     """
     Class for handling resources assigned to tasks
     """
-    def __init__(self, name, fullname=None):
+    def __init__(self, name, fullname=None, description=None):
         """
         Init a resource
 
@@ -454,6 +459,11 @@ class Resource(object):
             self.fullname = fullname
         else:
             self.fullname = name
+
+        if description is not None:
+            self.description = str(description)
+        else:
+            self.description = ''
 
         self.vacations = []
         self.member_of_groups = []
@@ -609,7 +619,7 @@ class Task(object):
     """
     Class for manipulating Tasks
     """
-    def __init__(self, name, start=None, stop=None, duration=None, depends_of=None, resources=None, percent_done=0, color=None, fullname=None, display=True, state=''):
+    def __init__(self, name, start=None, stop=None, duration=None, depends_of=None, resources=None, percent_done=0, color=None, fullname=None, description=None, display=True, state=''):
         """
         Initialize task object. Two of start, stop or duration may be given.
         This task can rely on other task and will be completed with resources.
@@ -635,6 +645,11 @@ class Task(object):
             self.fullname = fullname
         else:
             self.fullname = name
+
+        if description is not None:
+            self.description = str(description)
+        else:
+            self.description = ''
 
         self.start = start
         self.stop = stop
@@ -1321,7 +1336,7 @@ class Milestone(Task):
     """
     Class for manipulating Milestones
     """
-    def __init__(self, name, start=None, depends_of=None, color=None, fullname=None, display=True):
+    def __init__(self, name, start=None, depends_of=None, color=None, fullname=None, description=None, display=True):
         """
         Initialize milestone object. Two of start, stop or duration may be given.
         This milestone can rely on other milestone and will be completed with resources.
@@ -1342,6 +1357,12 @@ class Milestone(Task):
             self.fullname = fullname
         else:
             self.fullname = name
+
+        if description is not None:
+            self.description = str(description)
+        else:
+            self.description = ''
+
 
         self.start = start
         self.stop = start
@@ -1623,16 +1644,24 @@ class Project(object):
     """
     Class for handling projects
     """
-    def __init__(self, name="", color=None):
+    def __init__(self, name, color=None, description=None):
         """
         Initialize project with a given name and color for all tasks
 
+        Arguments:
+        name -- string, name of the project            
+
         Keyword arguments:
-        name -- string, name of the project
         color -- color for all tasks of the project
         """
         self.tasks = []
         self.name = name
+        
+        if description is not None:
+            self.description = str(description)
+        else:
+            self.description = ''
+        
         if color is None:
             self.color = '#FFFF90'
         else:
