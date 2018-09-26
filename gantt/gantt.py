@@ -1657,6 +1657,8 @@ class Project(object):
         self.tasks = []
         self.name = name
         
+        self._tasks_dict = {}
+        
         if description is not None:
             self.description = str(description)
         else:
@@ -1670,6 +1672,9 @@ class Project(object):
         self.cache_nb_elements = None
         return
 
+    def __getitem__(self, key):
+        return self._tasks_dict[key]
+
     def add_task(self, task):
         """
         Add a Task to the Project. Task can also be a subproject
@@ -1678,6 +1683,13 @@ class Project(object):
         task -- Task or Project object
         """
         self.tasks.append(task)
+        
+        if task.name in self._tasks_dict:
+            msg = 'Task name {} already in project'.format(task.name)
+            raise ValueError(msg)
+        else:
+            self._tasks_dict[task.name] = task
+            
         self.cache_nb_elements = None
         return
 
