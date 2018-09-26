@@ -42,6 +42,7 @@ import logging
 import sys
 import types
 import re
+import collections
 
 # https://bitbucket.org/mozman/svgwrite
 # http://svgwrite.readthedocs.org/en/latest/
@@ -57,6 +58,12 @@ cm = 35.43307
 # https://labix.org/python-dateutil
 import dateutil.relativedelta
 
+
+def _itercheck(obj):
+    """
+    see if we are a non-string iterable
+    """
+    return not isinstance(obj, str) and isinstance(obj, collections.Iterable)
 
 class _my_svgwrite_drawing_wrapper(svgwrite.Drawing):
     """
@@ -1693,6 +1700,24 @@ class Project(object):
         self.cache_nb_elements = None
         return
 
+    def _local_depends_of(self, depends_of):
+        """
+        check the provided depends_of list for items that are in the 
+        current Project
+        """
+                
+        if depends_of is None:
+            return None
+        
+        # conver to a list or make a single element list of we are not iterable
+        if _itercheck(depends_of):
+            depends_of = list(depends_of)
+        else:
+            depends_of = [depends_of]
+        
+        return [self._tasks_dict[x] if x in self._tasks_dict else x for x in depends_of]
+        
+
     def Task(self, **kwargs):
         """
         Creates a Task and adds it to the project.  This is a pure convience
@@ -1701,8 +1726,14 @@ class Project(object):
         All of the key word arguments are passed directly on to create
         a Task object
         
+        depends_of will first see if the item is a key in the current Project
+        and if so use that as the dependancy.
+        
         returns the task
         """
+        
+        if 'depends_of' in kwargs:
+            kwargs['depends_of'] = self._local_depends_of(kwargs['depends_of'])
         
         t = Task(**kwargs)
         self.add_task(t)
@@ -1720,6 +1751,9 @@ class Project(object):
         returns the Milestone
         """
         
+        if 'depends_of' in kwargs:
+            kwargs['depends_of'] = self._local_depends_of(kwargs['depends_of'])
+
         m = Milestone(**kwargs)
         self.add_task(m)
         
